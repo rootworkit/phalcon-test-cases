@@ -1,0 +1,21 @@
+{
+    "name": "rootwork/phalcon-test-cases",
+    "description": "Phalcon Test Cases",
+    "license": "BSD-3-Clause",
+    "keywords": ["rootwork", "phalcon", "phpunit"],
+    "homepage": "https://github.com/rootworkit/phalcon-test-cases",
+    "authors": [
+        {
+            "name": "Mike Soule",
+            "email": "mike@rootwork.it"
+        }
+    ],
+    "require": {
+        "phalcon/devtools": "^2.0",
+        "phpunit/phpunit": "^5.3",
+        "rootwork/phpunit-helpers": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "Rootwork\\Phalcon\\": "src/Phalcon/" }
+    }
+}
