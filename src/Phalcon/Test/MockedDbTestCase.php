@@ -52,7 +52,9 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
         self::$dbResults = [];
         self::$insertIds = [];
 
-        $db = $this->getDI()->get('db');
+        $di = $this->getDI();
+        $db = $di->get('db');
+
         if ($db instanceof Pdo && !($db instanceof MockObject)) {
             $this->mockDb('db');
         }
@@ -95,7 +97,7 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
      *
      * @return $this
      */
-    public function queueDbResult($sql, array $bindParams, array $fetchData)
+    public function queueDbResult($sql, array $bindParams = null, array $fetchData)
     {
         $queryKey   = $sql . '::' . serialize($bindParams);
         $result     = $this->getMock(
@@ -152,6 +154,8 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
         $dialectClass   = get_class($this->getPropertyValue($db, '_dialect'));
         $mockDialect    = $this->getMock($dialectClass, null, [], '', false);
 
+        //$this->queueMetaData($db);
+
         /** @var Pdo|MockObject $db */
         $mockDb = $this->getMock(
             $dbClass,
@@ -184,7 +188,11 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
             );
         });
 
-        $mockDb->expects($this->any())->method('query')->willReturnCallback(function ($sql, $bindParams) {
+        $mockDb->expects($this->any())->method('query')->willReturnCallback(function ($sql, $bindParams) use ($db) {
+            if (stripos($sql, 'DESCRIBE') === 0) {
+                return $db->query($sql);
+            }
+
             $queryKey = $sql . '::' . serialize($bindParams);
 
             if (isset(self::$dbResults[$queryKey])) {
