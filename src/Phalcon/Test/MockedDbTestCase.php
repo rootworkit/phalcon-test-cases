@@ -2,6 +2,7 @@
 
 namespace Rootwork\Phalcon\Test;
 
+use PHPUnit\Framework\TestCase;
 use Rootwork\PHPUnit\Helper\Accessor;
 use Phalcon\Di\InjectionAwareInterface;
 use Phalcon\DiInterface;
@@ -14,7 +15,7 @@ use PHPUnit_Framework_MockObject_MockObject as MockObject;
  *
  * @package     Rootwork\Phalcon\Test
  */
-class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionAwareInterface
+class MockedDbTestCase extends TestCase implements InjectionAwareInterface
 {
     use Accessor;
 
@@ -100,13 +101,10 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
     public function queueDbResult($sql, array $bindParams = null, array $fetchData)
     {
         $queryKey   = $sql . '::' . serialize($bindParams);
-        $result     = $this->getMock(
-            'Phalcon\\Db\\Result\\Pdo',
-            ['numRows', 'setFetchMode', 'fetchAll', 'fetch'],
-            [],
-            '',
-            false
-        );
+        $result     = $this->getMockBuilder('Phalcon\\Db\\Result\\Pdo')
+            ->setMethods(['numRows', 'setFetchMode', 'fetchAll', 'fetch'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->setPropertyValue($result, '_sqlStatement', $sql);
         $result->expects($this->any())->method('numRows')->will($this->returnValue(count($fetchData)));
@@ -152,18 +150,16 @@ class MockedDbTestCase extends \PHPUnit_Framework_TestCase implements InjectionA
         $db             = $di->get($name);
         $dbClass        = get_class($db);
         $dialectClass   = get_class($this->getPropertyValue($db, '_dialect'));
-        $mockDialect    = $this->getMock($dialectClass, null, [], '', false);
+        $mockDialect    = $this->getMockBuilder($dialectClass)
+            ->disableOriginalConstructor()->getMock();
 
         //$this->queueMetaData($db);
 
         /** @var Pdo|MockObject $db */
-        $mockDb = $this->getMock(
-            $dbClass,
-            ['tableExists', 'query', 'execute', 'lastInsertId'],
-            [],
-            '',
-            false
-        );
+        $mockDb = $this->getMockBuilder($dbClass)
+            ->setMethods(['tableExists', 'query', 'execute', 'lastInsertId'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->setPropertyValue($mockDb, '_dialect', $mockDialect);
 
