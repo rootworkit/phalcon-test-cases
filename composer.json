@@ -13,7 +13,8 @@
     "require": {
         "phalcon/devtools": ">2.0",
         "phpunit/phpunit": "^5.3",
-        "rootwork/phpunit-helpers": "^2.0"
+        "rootwork/phpunit-helpers": "^2.0",
+        "phalcon/ide-stubs": "^3.2"
     },
     "autoload": {
         "psr-4": { "Rootwork\\Phalcon\\": "src/Phalcon/" }
